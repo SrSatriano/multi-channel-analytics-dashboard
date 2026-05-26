@@ -1,5 +1,6 @@
 import { ChannelComparison } from "@/components/ChannelComparison";
 import { MetricCards } from "@/components/MetricCards";
+import { RevenueChart } from "@/components/RevenueChart";
 import { computeMetrics, mockChannels } from "@/lib/metrics";
 
 export default function DashboardPage() {
@@ -13,6 +14,7 @@ export default function DashboardPage() {
         <p className="text-slate-400 mt-1">Métricas consolidadas de todos os canais</p>
       </header>
       <MetricCards metrics={aggregated} />
+      <RevenueChart channels={channels} />
       <ChannelComparison channels={channels} />
     </main>
   );
