@@ -4,6 +4,23 @@ Todas as mudanças notáveis deste projeto são documentadas neste arquivo.
 
 Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/).
 
+## [1.1.0] — 2026-11-17
+
+### Mudado
+
+- Os dados deixam de ser fixos no código: o painel importa o CSV do YouTube Studio (pt-BR e en).
+- Next 15, React 19 e exportação estática.
+
+### Adicionado
+
+- Filtros por canal e período, RPM e CTR ponderado, duração média e % assistido.
+- Visualizações por mês, ranking ordenável e dados persistidos no navegador.
+- 8 testes (vitest) e CI com typecheck, testes e build.
+
+### Removido
+
+- Variável `YOUTUBE_API_KEY` não usada e documentação de deploy que não correspondia ao projeto.
+
 ## [1.0.0] — 2026-03-26
 
 ### Adicionado

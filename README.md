@@ -1,186 +1,61 @@
-<div align="center">
+# Multi-Channel Analytics Dashboard
 
-# Dashboard analítico multicanal
+[![CI](https://github.com/SrSatriano/multi-channel-analytics-dashboard/actions/workflows/ci.yml/badge.svg)](https://github.com/SrSatriano/multi-channel-analytics-dashboard/actions/workflows/ci.yml)
+![Next.js](https://img.shields.io/badge/Next.js-15-000000?logo=nextdotjs)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
 
-<p>
-  <a href="https://github.com/SrSatriano/multi-channel-analytics-dashboard"><img src="https://img.shields.io/badge/GitHub-multi-channel-analytics-dashboard-24292e?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" /></a>
-  <a href="https://srsatriano.github.io/portfolio-matheus-satriano/"><img src="https://img.shields.io/badge/Portfólio-web-0891b2?style=for-the-badge" alt="Portfólio" /></a>
-</p>
+Painel para quem tem mais de um canal no YouTube. Você importa o CSV que o YouTube Studio exporta e vê, lado a lado:
+- RPM e receita;
+- CTR das impressões;
+- duração média assistida e % do vídeo;
+- visualizações por mês;
+- ranking de vídeos.
 
-<p>
-  <img src="https://img.shields.io/badge/versão-1.0.0-0ea5e9?style=flat-square" alt="versão" />
-  <img src="https://img.shields.io/badge/Tier-1-8b5cf6?style=flat-square" alt="tier" />
-  <img src="https://img.shields.io/badge/demo-pronto-22c55e?style=flat-square" alt="demo" />
-  <img src="https://img.shields.io/badge/licença-MIT-22c55e?style=flat-square" alt="licença" />
-  <img src="https://img.shields.io/badge/idioma-pt--BR-blue?style=flat-square" alt="idioma" />
-  <img src="https://img.shields.io/badge/CI-GitHub_Actions-8b5cf6?style=flat-square" alt="ci" />
-</p>
+Os dados ficam só no seu navegador. O site é estático e funciona sem servidor e sem chave de API.
 
-<p><strong>RPM, retenção e conversão consolidados em Next.js com gráficos interativos.</strong></p>
+![Painel](docs/screenshot.png)
 
-<p>
-  Autor: <a href="https://github.com/SrSatriano">@SrSatriano</a> ·
-  Release <strong>1.0.0</strong> (2026-03-26)
-</p>
+## Como usar com os seus canais
 
-</div>
+1. No YouTube Studio, abra **Análise**, clique em **Modo avançado**, escolha a aba **Conteúdo**, o período que quiser e **Exportar → CSV**.
+2. Abra o ZIP e pegue o arquivo **Dados da tabela.csv** (*Table data.csv*).
+3. No painel, digite o nome do canal e clique em **Importar CSV**. Repita para cada canal.
 
----
+Funcionam as exportações em português e em inglês. A linha "Total" do Studio é ignorada, e reimportar um canal substitui os dados dele.
 
-## Índice
+## O que é calculado
 
-1. [Visão geral](#visão-geral)
-2. [Problema e solução](#problema-e-solução)
-3. [Para quem é](#para-quem-é)
-4. [Casos de uso](#casos-de-uso)
-5. [Funcionalidades](#funcionalidades)
-6. [Stack tecnológica](#stack-tecnológica)
-7. [Arquitetura](#arquitetura)
-8. [Estrutura do repositório](#estrutura-do-repositório)
-9. [Pré-requisitos](#pré-requisitos)
-10. [Instalação e execução](#instalação-e-execução)
-11. [Configuração](#configuração)
-12. [Testes](#testes)
-13. [Performance](#performance)
-14. [Deploy e operação](#deploy-e-operação)
-15. [Limitações conhecidas](#limitações-conhecidas)
-16. [Roadmap](#roadmap)
-17. [Documentação complementar](#documentação-complementar)
-18. [Segurança e licença](#segurança-e-licença)
-
----
-
-## Visão geral
-
-Este repositório faz parte do **portfólio de engenharia** mantido por [@SrSatriano](https://github.com/SrSatriano). A versão **1.0.0** entrega implementação do núcleo do produto, testes automatizados, pipeline de integração contínua e documentação operacional em **português brasileiro**.
-
-O objetivo é permitir que você clone, execute e evolua o projeto com clareza — do desenvolvimento local ao deploy em produção.
-
-## Problema e solução
-
-| | |
+| Métrica | Fórmula |
 |---|---|
-| **Problema** | Métricas de YouTube, Ads e afiliados ficam em silos. |
-| **Solução** | Painel único com fórmulas documentadas e dados mock ou conectores reais. |
+| RPM | receita estimada ÷ visualizações × 1.000 |
+| CTR | ponderado pelas impressões de cada vídeo, não a média simples das taxas |
+| Duração média assistida | horas assistidas × 3.600 ÷ visualizações |
+| % do vídeo assistido | segundos assistidos ÷ (duração × visualizações), nos vídeos com duração |
 
-## Para quem é
+Filtros por canal e por período de publicação; o ranking ordena por views, receita, RPM, CTR, média assistida ou data.
 
-Creators, gestores de tráfego e analistas de growth.
-
-## Casos de uso
-
-- Reunião semanal de performance
-- Comparativo entre canais
-
-## Funcionalidades
-
-- [x] Cards de KPI agregados
-- [x] Gráfico de receita (Recharts)
-- [x] Tabela comparativa por canal
-- [x] Fórmulas RPM, retenção e conversão
-- [x] Deploy Vercel documentado
-
-## Stack tecnológica
-
-| Camada | Tecnologias |
-|--------|-------------|
-| **Principal** | Next.js 14, Tailwind CSS, Recharts, TypeScript |
-
-## Arquitetura
-
-```mermaid
-flowchart LR
-  BR[Browser] --> NX[Next.js App Router]
-  NX --> API[Route Handlers / BFF]
-  API --> DB[(Supabase / mock)]
-```
-
-Detalhamento de componentes, fluxos de dados e decisões de design: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-
-## Estrutura do repositório
-
-| Caminho | Descrição |
-|---------|-----------|
-| `app/` | App Router |
-| `components/` | UI reutilizável |
-
-## Pré-requisitos
-
-Node.js 20+, npm ou pnpm.
-
-## Instalação e execução
-
-```bash
-git clone https://github.com/SrSatriano/multi-channel-analytics-dashboard.git
-cd multi-channel-analytics-dashboard
-```
+## Rodando
 
 ```bash
 npm install
-npm run dev
+npm run dev          # http://localhost:3000
+npm test             # parser e métricas (vitest)
+npm run build        # gera o site estático em out/
 ```
 
-## Configuração
+Para publicar no GitHub Pages, gere com `BASE_PATH=/multi-channel-analytics-dashboard npm run build` e publique a pasta `out/`.
 
-| Variável | Descrição | Exemplo |
-|----------|-----------|--------|
-| `NEXT_PUBLIC_API_URL` | Backend de métricas | `http://localhost:4000` |
+## Estrutura
 
-> **Importante:** nunca faça commit de arquivos `.env` com segredos reais. Use `.env.example` como referência.
-
-## Testes
-
-Execute a suíte de testes antes de abrir pull requests:
-
-```bash
-npm run build
+```
+lib/youtube.ts   parser do CSV do Studio (aspas, números pt-BR/en, datas "3 de nov. de 2026" / "Nov 3, 2026")
+lib/metrics.ts   totais, por canal, por mês, ranking e filtros
+lib/demo.ts      dados fictícios e determinísticos para a demonstração
+components/      KPIs, gráficos (Recharts), tabela e importador
+tests/           8 testes com exportações reais de exemplo em pt-BR e en (examples/)
 ```
 
-A pipeline [`.github/workflows/ci.yml`](.github/workflows/ci.yml) repete build e testes em cada push para `main`.
+## Autor
 
-## Performance
-
-| Lighthouse Performance | 94 |
-
-Metodologia, hardware de referência e flags de compilação: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
-
-## Deploy e operação
-
-| Guia | Conteúdo |
-|------|----------|
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Homologação, produção e rollback |
-| [docs/OPERATIONS.md](docs/OPERATIONS.md) | Monitoramento, alertas e incidentes |
-
-## Limitações conhecidas
-
-- Dados demo até conectar APIs reais
-
-## Roadmap
-
-- OAuth YouTube Analytics
-
-## Documentação complementar
-
-| Documento | Descrição |
-|-----------|-----------|
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Arquitetura e decisões técnicas |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Deploy passo a passo |
-| [docs/OPERATIONS.md](docs/OPERATIONS.md) | Runbook operacional |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Como contribuir |
-| [CHANGELOG.md](CHANGELOG.md) | Histórico de versões |
-| [SECURITY.md](SECURITY.md) | Política de segurança |
-| [AUTHORS.md](AUTHORS.md) | Créditos |
-
-## Segurança e licença
-
-- Dependências revisadas na release **1.0.0**
-- Vulnerabilidades: siga [SECURITY.md](SECURITY.md)
-- Licença: [MIT](LICENSE) © SrSatriano 2026
-
----
-
-<p align="center">
-  <a href="https://srsatriano.github.io/portfolio-matheus-satriano/">Portfólio completo</a> ·
-  <a href="https://github.com/SrSatriano">@SrSatriano</a> ·
-  <a href="https://github.com/SrSatriano/multi-channel-analytics-dashboard">Este repositório</a>
-</p>
+Matheus Rodrigues Satriano — [github.com/SrSatriano](https://github.com/SrSatriano)

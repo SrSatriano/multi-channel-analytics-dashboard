@@ -1,82 +1,15 @@
-# Arquitetura — Dashboard analítico multicanal
+# Arquitetura
 
-> Versão do documento: **1.0.0** · Última revisão: **2026-03-26**
+Aplicação Next.js 15 exportada como site estático (`output: "export"`). Não há backend: o CSV é lido no navegador com `File.text()` e os vídeos ficam em `localStorage` (com try/catch, porque o armazenamento pode estar indisponível).
 
-## 1. Visão geral
-
-Painel único com fórmulas documentadas e dados mock ou conectores reais.
-
-Este documento descreve como os componentes se relacionam, onde há estado, e como escalar ou observar o sistema em produção.
-
-## 2. Diagrama de contexto
-
-```mermaid
-flowchart LR
-  BR[Browser] --> NX[Next.js App Router]
-  NX --> API[Route Handlers / BFF]
-  API --> DB[(Supabase / mock)]
+```
+CSV do Studio ──► parseYoutubeCsv(texto, canal) ──► Video[]
+                                                   │
+             filtros (canal, período) ─────────────┤
+                                                   ▼
+        totals / byChannel / byMonth / topVideos ──► componentes Recharts e tabela
 ```
 
-## 3. Componentes principais
-
-| Componente | Responsabilidade |
-|------------|------------------|
-| Cards | Cards de KPI agregados |
-| Gráfico | Gráfico de receita (Recharts) |
-| Tabela | Tabela comparativa por canal |
-| Fórmulas | Fórmulas RPM, retenção e conversão |
-| Deploy | Deploy Vercel documentado |
-| Observabilidade | Métricas, logs estruturados e health checks |
-| Persistência | Estado durável e idempotência onde aplicável |
-
-## 4. Fluxos críticos
-
-### 4.1 Caminho feliz
-
-1. Cliente ou operador envia requisição/evento.
-2. Camada de serviço valida entrada e autentica quando necessário.
-3. Núcleo de domínio executa regra de negócio.
-4. Resultado é persistido e/ou publicado para assinantes.
-5. Métricas e logs registram latência e resultado.
-
-### 4.2 Falhas e degradação
-
-- Timeouts configuráveis em integrações externas.
-- Retry com backoff apenas onde a operação é idempotente.
-- Modo degradado documentado no README (ex.: sem LLM, sem GPU).
-
-## 5. Decisões de design
-
-| Decisão | Motivação |
-|---------|-----------|
-| **Baixa latência** | Hot path sem alocações desnecessárias no núcleo |
-| **Fail-safe** | Falha parcial não corrompe estado; reconciliação quando possível |
-| **Auditabilidade** | Logs estruturados com identificador de correlação |
-| **Testabilidade** | Contratos estáveis e testes automatizados na CI |
-
-## 6. Escalabilidade
-
-- Escale horizontalmente camadas **stateless** (API, workers).
-- Particione estado por chave de negócio (símbolo, tenant, shard).
-- Use filas para picos assimétricos entre produtor e consumidor.
-
-## 7. Observabilidade
-
-| Sinal | Uso |
-|-------|-----|
-| Latência p50/p99 | SLO de experiência |
-| Taxa de erro | Alertas de regressão |
-| Utilização CPU/GPU | Capacity planning |
-| Lag de fila | Autoscaling |
-
-## 8. Segurança na arquitetura
-
-- Segredos apenas em variáveis de ambiente ou secret manager.
-- Princípio do menor privilégio em tokens de API e RBAC.
-- Dados sensíveis: minimize retenção e documente bases legais (LGPD quando aplicável).
-
-## 9. Referências
-
-- [README](../README.md) — visão do produto
-- [DEPLOYMENT.md](DEPLOYMENT.md) — ambientes
-- [OPERATIONS.md](OPERATIONS.md) — runbook
+- **Parser:** acha as colunas por nome em pt-BR ou en, separa respeitando aspas e detecta vírgula ou ponto e vírgula como separador. Interpreta "1.234,56" e "1,234.56" e os formatos de data do Studio.
+- **Métricas:** funções puras em `lib/metrics.ts`, todas testadas. O CTR é ponderado pelas impressões e a retenção usa só os vídeos com duração conhecida.
+- **Demo:** gerador congruencial com seed fixa. Os dados de demonstração são sempre os mesmos e marcados na tela como fictícios.
